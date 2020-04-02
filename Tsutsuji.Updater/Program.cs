@@ -12,55 +12,41 @@ namespace Tsutsuji.Updater
         public static string HyperfluxResourcesPath = HyperfluxPath + @"\Resources";
         public static string GeometryDashPath = @"C:\Program Files (x86)\Steam\steamapps\common\Geometry Dash";
 
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
+
         [STAThread]
         static void Main(string[] args)
         {
             if (args.Length < 1 || args[0] != "--launcher")
-            {
-                DialogResult dialog = MessageBox.Show("You cannot properly run the updater executable by itself.", "Tsutsuji Launcher",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                if (dialog == DialogResult.OK)
-                {
-                    Application.Exit();
-                    return;
-                }
-            }
+                ErrorThrowMessage("You cannot properly run the updater executable by itself.");
 
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            if (!Directory.Exists(GeometryDashPath)) {
-                DialogResult dialog = MessageBox.Show("You do not have Geometry Dash installed on this PC!", "Tsutsuji Launcher",
-                    MessageBoxButtons.OK, MessageBoxIcon.Error);
-
-                if (dialog == DialogResult.OK)
-                {
-                    Application.Exit();
-                    return;
-                }
-            }
+            
+            if (!Directory.Exists(GeometryDashPath)) 
+                ErrorThrowMessage("You do not have Geometry Dash installed on this PC!");
 
             if (!Directory.Exists(HyperfluxPath))
             {
-                // uwu
-                Debug.WriteLine("sex");
+                Debug.WriteLine("First time user installation.");
                 Directory.CreateDirectory(HyperfluxPath);
                 Directory.CreateDirectory(HyperfluxResourcesPath);
 
-                Application.Run(new Screens.Updater("first"));
+                Application.Run(new Updater(UpdaterType.First));
                 return;
             }
-
+            
             try
             {
-                Application.Run(new Screens.Updater("update"));
-            } catch (ObjectDisposedException e)
-            {
-                return;
+                Application.Run(new Updater(UpdaterType.Update));
             }
+             catch (Exception e)
+            {
+                Debug.WriteLine(e.ToString);
+                return;
+             }
         }
+        
+        private void ErrorThrowMessage(string msg) 
+            => if (MessageBox.Show(msg, "Tsutsuji Launcher", MessageBoxButtons.OK, MessageBoxIcon.Error) == DialogResult.OK) Application.Exit();
     }
 }
