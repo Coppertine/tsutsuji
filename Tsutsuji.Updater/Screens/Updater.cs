@@ -37,21 +37,21 @@ namespace Tsutsuji.Updater.Screens
             "steam_api.dll"
         };
 
-        public Updater(string type)
+        public Updater(UpdaterType type)
         {
-            InitializeComponent();
-
-            if (type == "first")
-            {
-                Show();
-                firstUpdate();
-            }
-            else if (type == "update")
-            {
-                Show();
-                RunUpdate();
-            }
+           InitalizeComponent();
+           show();  
+           switch (type)
+           {
+               case UpdaterType.First:
+                   firstUpdate();
+                   break;
+               case UpdaterType.Update:
+                 RunUpdate();
+                 break;
+           }
         }
+
 
         private void firstUpdate()
         {
@@ -59,7 +59,7 @@ namespace Tsutsuji.Updater.Screens
 
             var files = Directory.GetFiles(Program.GeometryDashPath + @"\Resources");
 
-            SizeText.Text = @"0 of " + (necessaryFiles.Length + files.Length) + @" files";
+            SizeText.Text = $"0 of {necessaryFiles.Length + files.Length} files";
 
             foreach (string file in files)
             {
@@ -83,10 +83,9 @@ namespace Tsutsuji.Updater.Screens
                 UpdateContents(fileName);
             }
             
-            // mine
             void ResetContents()
             {
-                FileName.Text = @"Downloading: ???";
+                FileName.Text = "Downloading: ???";
                 ProgressBar.Value = 0;
 
                 SizeText.Update();
@@ -99,9 +98,8 @@ namespace Tsutsuji.Updater.Screens
 
                 var progress = (int)((float)current / (necessaryFiles.Length + files.Length) * 100);
 
-                FileName.Text = @"Copying: " + fileName;
-
-                SizeText.Text = current + @" of " + (necessaryFiles.Length + files.Length) + @" files";
+                FileName.Text = $"Copying: {fileName}";
+                SizeText.Text = $"{current} of {necessaryFiles.Length + files.Length} files";
                 ProgressBar.Value = progress;
 
                 SizeText.Update();
